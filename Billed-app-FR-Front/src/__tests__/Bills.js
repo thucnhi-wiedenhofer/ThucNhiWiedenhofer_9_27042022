@@ -209,7 +209,7 @@ describe("Given I am a user connected as Employee", () => {
       window.onNavigate(ROUTES_PATH.Bills)
       await waitFor(() => screen.getByText("Mes Notes de frais"))
       const type  = await screen.getAllByText("Type")
-      expect(type[0]).toBeTruthy()
+      expect(type).toBeTruthy()
       const name  = await screen.getByText("Nom")
       expect(name).toBeTruthy()
       const date  = await screen.getByText("Date")
