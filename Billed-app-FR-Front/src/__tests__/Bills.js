@@ -14,18 +14,6 @@ import router from "../app/Router.js";
 
 jest.mock("../app/store", () => mockStore)
 
-/*Before each test, i'm connected as employee:
-beforeEach(() => {
-  const onNavigate = (pathname) => {
-    document.body.innerHTML = ROUTES({ pathname })
-  }
-
-  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  window.localStorage.setItem('user', JSON.stringify({
-    type: 'Employee'
-  }))
-})
-*/
 // composant views/Bills :
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -207,3 +195,83 @@ describe('Given I am connected as Employee and I am on Bills page', () => {
     })
   })
   })
+
+// test d'intégration getBills
+describe("Given I am a user connected as Employee", () => {
+  describe("When I navigate to Bills", () => {
+    test("fetches bills from mock API GET", async () => {
+      
+      localStorage.setItem("user", JSON.stringify({ type: "Employee", email: "a@a" }));
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      await waitFor(() => screen.getByText("Mes Notes de frais"))
+      const type  = await screen.getAllByText("Type")
+      expect(type[0]).toBeTruthy()
+      const name  = await screen.getByText("Nom")
+      expect(name).toBeTruthy()
+      const date  = await screen.getByText("Date")
+      expect(date).toBeTruthy()
+      const fee  = await screen.getByText("Montant")
+      expect(fee).toBeTruthy()
+      const status  = await screen.getByText("Statut")
+      expect(status).toBeTruthy()
+      const action  = await screen.getByText("Action")
+      expect(action).toBeTruthy()
+      expect(screen.getByTestId("btn-new-bill")).toBeTruthy()
+    })
+  })
+})
+
+describe("Given I am a user connected as Employee", () => {
+  describe("When an error occurs on API", () => {
+    beforeEach(() => {
+      jest.spyOn(mockStore, "bills")
+      Object.defineProperty(
+          window,
+          'localStorage',
+          { value: localStorageMock }
+      )
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee',
+        email: "a@a"
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.appendChild(root)
+      router()
+    })
+    test("fetches bills from an API and fails with 404 message error", async () => {
+
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 404"))
+          }
+        }})
+      window.onNavigate(ROUTES_PATH.Bills)
+      await new Promise(process.nextTick);
+      const message = await screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
+    })
+
+    test("fetches messages from an API and fails with 500 message error", async () => {
+
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 500"))
+          }
+        }})
+
+      window.onNavigate(ROUTES_PATH.Bills)
+      await new Promise(process.nextTick);
+      const message = await screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
+    })
+  })
+})
+
+
