@@ -199,27 +199,14 @@ describe('Given I am connected as Employee and I am on Bills page', () => {
 // test d'intégration getBills
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills", () => {
-    test("fetches bills from mock API GET", async () => {
-      
+    test("fetches bills from mock API GET", async () => {      
       localStorage.setItem("user", JSON.stringify({ type: "Employee", email: "a@a" }));
       const root = document.createElement("div")
       root.setAttribute("id", "root")
       document.body.append(root)
       router()
       window.onNavigate(ROUTES_PATH.Bills)
-      await waitFor(() => screen.getByText("Mes Notes de frais"))
-      const type  = await screen.getAllByText("Type")
-      expect(type).toBeTruthy()
-      const name  = await screen.getByText("Nom")
-      expect(name).toBeTruthy()
-      const date  = await screen.getByText("Date")
-      expect(date).toBeTruthy()
-      const fee  = await screen.getByText("Montant")
-      expect(fee).toBeTruthy()
-      const status  = await screen.getByText("Statut")
-      expect(status).toBeTruthy()
-      const action  = await screen.getByText("Action")
-      expect(action).toBeTruthy()
+      await waitFor(() => screen.getByRole('heading', { name: /Mes Notes de frais/i }))
       expect(screen.getByTestId("btn-new-bill")).toBeTruthy()
     })
   })

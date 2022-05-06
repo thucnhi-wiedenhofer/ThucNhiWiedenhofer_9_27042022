@@ -24,26 +24,17 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
-    const extension = file.name.split('.').pop()
-    const isValid = ['jpg', 'jpeg', 'png'].includes(extension)
-
+    const isValid = ['jpg', 'jpeg', 'png'].includes(file.name.split('.').pop())
     if(isValid){
-      this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true
-        }
+      this.store.bills().create({ data: formData, headers: { noContentType: true }
       })
       .then(({fileUrl, key}) => {
-        console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
       }).catch(error => console.error(error))
     }else {
-      alert('Seuls les documents png, jpg ou jpeg sont autorisés!')
+      document.querySelector(".error").style.display = "block"
     }
   }
   handleSubmit = e => {
